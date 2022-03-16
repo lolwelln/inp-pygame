@@ -62,7 +62,7 @@ class PlayerSprite(BaseSprite):
             self.rect.x = self.rect.x - self.speed
         if keys[pygame.K_RIGHT]:
             self.rect.x = self.rect.x + self.speed
-        if keys[pygame.K_SPACE]:
+        if keys[pygame.K_UP]:
             self.jump()
 
     def check_collision(self):
