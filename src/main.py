@@ -89,8 +89,7 @@ class Config:
     GREY = (128, 128, 128)
     FPS = 30
     TILE_SIZE = 32
-    MAX_GRAVITY = -3
-    
+    MAX_GRAVITY = 0
 
 
 class Game:
