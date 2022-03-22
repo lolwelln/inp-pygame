@@ -1,3 +1,4 @@
+from tkinter import CENTER
 import pygame
 
 import sys
@@ -80,8 +81,8 @@ class GroundSprite(BaseSprite):
 
 
 class Config:
-    WINDOW_WIDTH = 640
-    WINDOW_HEIGHT = 420
+    WINDOW_WIDTH = 1000
+    WINDOW_HEIGHT = 1000
     BLACK = (0, 0, 0)
     RED = (255, 0, 0)
     GREEN = (0, 255, 0)
@@ -89,6 +90,7 @@ class Config:
     FPS = 30
     TILE_SIZE = 32
     MAX_GRAVITY = -3
+    
 
 
 class Game:
