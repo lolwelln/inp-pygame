@@ -41,7 +41,7 @@ class PlayerSprite(BaseSprite):
         self.y_velocity = Config.MAX_GRAVITY
         self.speed = 5
         self.standing = False
-        self.color = Config.RED
+        self.color = Config.BLACK
         self.image.fill(self.color)
         
 
@@ -86,9 +86,10 @@ class Config:
     RED = (255, 0, 0)
     GREEN = (0, 255, 0)
     GREY = (128, 128, 128)
+    rita = (230, 21, 222)
     FPS = 30
     TILE_SIZE = 32
-    MAX_GRAVITY = -3
+    MAX_GRAVITY = 0
 
 
 class Game:
@@ -105,7 +106,7 @@ class Game:
         self.all_sprites = pygame.sprite.LayeredUpdates()
         self.ground = pygame.sprite.LayeredUpdates()
         self.players = pygame.sprite.LayeredUpdates()
-
+        
         self.player = PlayerSprite(self, 10, 10)
         for i in range(20):
             GroundSprite(self, i, 12)
@@ -121,7 +122,12 @@ class Game:
         self.all_sprites.update()
 
     def draw(self):
-        self.screen.fill(Config.BLACK)
+        self.screen.blit(self.bg, (self.bg_x, 0))
+        tmp_bg = pygame.transform.flip(self.bg, True)
+        second_x = Config.WINDOW_WIDTH + self.bg_x
+        if self.bg_x > 0:
+            second_x -=2*Config.WINDOW_WIDTH
+        self.screen.fill(Config.rita)
         self.all_sprites.draw(self.screen)
         pygame.display.update()
 
