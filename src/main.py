@@ -16,8 +16,8 @@ class Spritesheet:
 
 class Config:
     TILE_SIZE = 32
-    WINDOW_WIDTH = TILE_SIZE * 20
-    WINDOW_HEIGHT = TILE_SIZE * 10
+    WINDOW_WIDTH = TILE_SIZE * 8
+    WINDOW_HEIGHT = TILE_SIZE * 13
     BLACK = (0, 0, 0)
     RED = (255, 0, 0)
     GREEN = (0, 255, 0)
