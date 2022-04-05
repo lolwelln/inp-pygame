@@ -106,7 +106,7 @@ class PlayerSprite(BaseSprite):
         if keys[pygame.K_RIGHT]:
             self.rect.x = self.rect.x + self.speed
         if keys[pygame.K_UP]:
-            self.jump()
+            self.rect.y = self.rect.y - self.speed
         self.update_camera()
 
 
@@ -114,17 +114,11 @@ class PlayerSprite(BaseSprite):
         x_c, y_c = self.game.screen.get_rect().center
         x_diff = x_c - self.rect.centerx
         y_diff = y_c - self.rect.centery
-        for sprite in self.game.all_sprites:
-            sprite.rect.x += x_diff
-            sprite.rect.y += y_diff
+        
         self.animate(x_diff)
 
         # Shift Background
-        self.game.bg_x += x_diff * Config.BG_SPEED
-        if self.game.bg_x > Config.WINDOW_WIDTH:
-            self.game.bg_x = -Config.WINDOW_WIDTH
-        elif self.game.bg_x < -Config.WINDOW_WIDTH:
-            self.game.bg_x = Config.WINDOW_WIDTH
+        
 
 
     def is_standing(self, hit):
