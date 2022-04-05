@@ -24,7 +24,7 @@ class Config:
     GREY = (128, 128, 128)
     WHITE = (255, 255, 255)
     FPS = 30
-    MAX_GRAVITY = -3
+    MAX_GRAVITY = 0
     BG_SPEED = 0.3
 
 
