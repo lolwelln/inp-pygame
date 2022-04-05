@@ -114,7 +114,7 @@ class PlayerSprite(BaseSprite):
         x_c, y_c = self.game.screen.get_rect().center
         x_diff = x_c - self.rect.centerx
         y_diff = y_c - self.rect.centery
-        for sprite in self.game.players:
+        for sprite in self.game.all_sprites:
             sprite.rect.x += x_diff
             sprite.rect.y += y_diff
         self.animate(x_diff)
