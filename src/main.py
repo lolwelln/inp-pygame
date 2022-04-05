@@ -107,6 +107,8 @@ class PlayerSprite(BaseSprite):
             self.rect.x = self.rect.x + self.speed
         if keys[pygame.K_UP]:
             self.rect.y = self.rect.y - self.speed
+        if keys[pygame.K_DOWN]:
+            self.rect.y = self.rect.y + self.speed
         self.update_camera()
 
 
