@@ -16,15 +16,15 @@ class Spritesheet:
 
 class Config:
     TILE_SIZE = 32
-    WINDOW_WIDTH = 224
-    WINDOW_HEIGHT = 384
+    WINDOW_WIDTH = 160
+    WINDOW_HEIGHT = 320
     BLACK = (0, 0, 0)
     RED = (255, 0, 0)
     GREEN = (0, 255, 0)
     GREY = (128, 128, 128)
     WHITE = (255, 255, 255)
     FPS = 30
-    MAX_GRAVITY = -3
+    MAX_GRAVITY = 0
     BG_SPEED = 0.3
 
 
@@ -106,7 +106,9 @@ class PlayerSprite(BaseSprite):
         if keys[pygame.K_RIGHT]:
             self.rect.x = self.rect.x + self.speed
         if keys[pygame.K_UP]:
-            self.jump()
+            self.rect.y = self.rect.y - self.speed
+        if keys[pygame.K_DOWN]:
+            self.rect.y = self.rect.y + self.speed
         self.update_camera()
 
 
@@ -114,17 +116,11 @@ class PlayerSprite(BaseSprite):
         x_c, y_c = self.game.screen.get_rect().center
         x_diff = x_c - self.rect.centerx
         y_diff = y_c - self.rect.centery
-        for sprite in self.game.all_sprites:
-            sprite.rect.x += x_diff
-            sprite.rect.y += y_diff
+        
         self.animate(x_diff)
 
         # Shift Background
-        self.game.bg_x += x_diff * Config.BG_SPEED
-        if self.game.bg_x > Config.WINDOW_WIDTH:
-            self.game.bg_x = -Config.WINDOW_WIDTH
-        elif self.game.bg_x < -Config.WINDOW_WIDTH:
-            self.game.bg_x = Config.WINDOW_WIDTH
+        
 
 
     def is_standing(self, hit):
