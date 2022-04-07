@@ -123,10 +123,6 @@ class PlayerSprite(BaseSprite):
         
         self.animate(x_diff)
 
-        # Shift Background
-        
-
-
     def is_standing(self, hit):
         if self.y_velocity > 0:
             return False
