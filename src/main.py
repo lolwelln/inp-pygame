@@ -76,6 +76,7 @@ class PlayerSprite(BaseSprite):
         self.current_frame = 0
         self.animation_duration = 30
         self.jump_force = 10
+        self.movie_counter = 0
         
 
     def animate(self, x_diff):
@@ -100,15 +101,18 @@ class PlayerSprite(BaseSprite):
             self.standing = False
 
     def handle_movement(self):
-        keys = pygame.key.get_pressed()
-        if keys[pygame.K_LEFT]:
-            self.rect.x = self.rect.x - self.speed
-        if keys[pygame.K_RIGHT]:
-            self.rect.x = self.rect.x + self.speed
-        if keys[pygame.K_UP]:
-            self.rect.y = self.rect.y - self.speed
-        if keys[pygame.K_DOWN]:
-            self.rect.y = self.rect.y + self.speed
+        if self.movie_counter > config.FPS * 2: 
+            keys = pygame.key.get_pressed()
+            if keys[pygame.K_LEFT]:
+                self.rect.x = self.rect.x - self.speed
+            if keys[pygame.K_RIGHT]:
+                self.rect.x = self.rect.x + self.speed
+            if keys[pygame.K_UP]:
+                self.rect.y = self.rect.y - self.speed
+            if keys[pygame.K_DOWN]:
+                self.rect.y = self.rect.y + self.speed
+        else: 
+            self.rect.y = self.rect.y - 160
         self.update_camera()
 
 
