@@ -1,6 +1,8 @@
+from tracemalloc import start
 import pygame
 
 import sys
+
 
 class Spritesheet:
     def __init__(self, file):
