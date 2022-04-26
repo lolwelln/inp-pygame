@@ -1,6 +1,9 @@
+from tkinter import Place
 import pygame
 
 import sys
+
+
 
 class Spritesheet:
     def __init__(self, file):
@@ -91,6 +94,11 @@ class PlayerSprite(BaseSprite):
     
     def update(self):
         self.handle_movement()
+        
+        if self.rect.x>160-Config.TILE_SIZE:
+            self.rect.x = 160 - Config.TILE_SIZE
+        if self.rect.x<0:
+            self.rect.x = 0
         self.rect.y = self.rect.y - self.y_velocity
         self.check_collision()
         self.y_velocity = max(self.y_velocity - 0.5, Config.MAX_GRAVITY)
@@ -101,19 +109,15 @@ class PlayerSprite(BaseSprite):
             self.standing = False
 
     def handle_movement(self):
-        if self.movie_counter > config.FPS * 2: 
-            keys = pygame.key.get_pressed()
-            if keys[pygame.K_LEFT]:
-                self.rect.x = self.rect.x - self.speed
-            if keys[pygame.K_RIGHT]:
-                self.rect.x = self.rect.x + self.speed
-            if keys[pygame.K_UP]:
-                self.rect.y = self.rect.y - self.speed
-            if keys[pygame.K_DOWN]:
-                self.rect.y = self.rect.y + self.speed
-        else: 
-            self.rect.y = self.rect.y - 160
-        self.update_camera()
+        keys = pygame.key.get_pressed()
+        if keys[pygame.K_LEFT]:
+            self.rect.x = self.rect.x - self.speed
+        if keys[pygame.K_RIGHT]:
+            self.rect.x = self.rect.x + self.speed
+        if keys[pygame.K_UP]:
+            self.rect.y = self.rect.y - self.speed
+        if keys[pygame.K_DOWN]:
+            self.rect.y = self.rect.y + self.speed
 
 
     def update_camera(self):
@@ -237,6 +241,7 @@ def main():
     g.new()
 
     g.game_loop()
+
 
     pygame.quit()
     sys.exit()
