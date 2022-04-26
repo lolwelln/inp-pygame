@@ -109,13 +109,16 @@ class PlayerSprite(BaseSprite):
             self.standing = False
 
     def handle_movement(self):
-        keys = pygame.key.get_pressed()
+        keys = pygame.key.get_pressed() 
         if keys[pygame.K_LEFT]:
-            self.rect.x = self.rect.x - self.speed
+            if self.rect.x > self.speed:
+                self.rect.x = self.rect.x - self.speed
         if keys[pygame.K_RIGHT]:
-            self.rect.x = self.rect.x + self.speed
+            if self.rect.right < Config.WINDOW_WIDTH - self.speed:
+                self.rect.x = self.rect.x + self.speed
         if keys[pygame.K_UP]:
-            self.rect.y = self.rect.y - self.speed
+            if self.rect.y > self.speed:
+                self.rect.y = self.rect.y - self.speed      
         if keys[pygame.K_DOWN]:
             self.rect.y = self.rect.y + self.speed
 
@@ -241,7 +244,6 @@ def main():
     g.new()
 
     g.game_loop()
-
 
     pygame.quit()
     sys.exit()
