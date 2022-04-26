@@ -1,7 +1,9 @@
-from tkinter import CENTER
+from tkinter import Place
 import pygame
 
 import sys
+
+
 
 class Spritesheet:
     def __init__(self, file):
@@ -77,6 +79,7 @@ class PlayerSprite(BaseSprite):
         self.current_frame = 0
         self.animation_duration = 30
         self.jump_force = 10
+        self.movie_counter = 0
         
 
     def animate(self, x_diff):
@@ -91,6 +94,11 @@ class PlayerSprite(BaseSprite):
     
     def update(self):
         self.handle_movement()
+        
+        if self.rect.x>160-Config.TILE_SIZE:
+            self.rect.x = 160 - Config.TILE_SIZE
+        if self.rect.x<0:
+            self.rect.x = 0
         self.rect.y = self.rect.y - self.y_velocity
         self.check_collision()
         self.y_velocity = max(self.y_velocity - 0.5, Config.MAX_GRAVITY)
@@ -112,9 +120,7 @@ class PlayerSprite(BaseSprite):
             if self.rect.y > self.speed:
                 self.rect.y = self.rect.y - self.speed      
         if keys[pygame.K_DOWN]:
-            if self.rect.y > self.speed:
-                self.rect.y = self.rect.y + self.speed
-        self.update_camera()
+            self.rect.y = self.rect.y + self.speed
 
 
     def update_camera(self):
@@ -123,10 +129,6 @@ class PlayerSprite(BaseSprite):
         y_diff = y_c - self.rect.centery
         
         self.animate(x_diff)
-
-        # Shift Background
-        
-
 
     def is_standing(self, hit):
         if self.y_velocity > 0:
