@@ -197,7 +197,7 @@ class Game:
         self.screen = pygame.display.set_mode( (Config.WINDOW_WIDTH, Config.WINDOW_HEIGHT) ) 
         self.clock = pygame.time.Clock()
         self.bg = pygame.image.load("res/bg-small.png")
-        self.go = pygame.image.load("res/gameoverr")
+        self.go = pygame.image.load("res/gameoverr.png")
         self.bg_x = 0
         self.gameover = False 
         self.playing = False
