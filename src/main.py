@@ -3,7 +3,6 @@ import pygame
 
 import sys
 
-
 class Spritesheet:
     def __init__(self, file):
         self.sheet = pygame.image.load(file).convert()
@@ -13,8 +12,6 @@ class Spritesheet:
         sprite.blit(self.sheet, (0, 0), (x, y, width, height))
         sprite.set_colorkey(Config.WHITE)
         return sprite
-
-
 
 class Config:
     TILE_SIZE = 32
@@ -79,7 +76,14 @@ class PlayerSprite(BaseSprite):
         self.animation_duration = 30
         self.jump_force = 10
         self.movie_counter = 0
-        
+
+class baum (pygame.sprite.Sprite):
+    def __init__(self, game, x, y):
+        img_data = {
+            'spritesheet': Spritesheet("res/baum.png"),
+        }
+        super().__init__(game, x, y, groups=game.ground, layer=1)
+        self.rect = self.image.get_rect()
 
     def animate(self, x_diff):
         self.anim_counter += abs(x_diff)
@@ -191,7 +195,12 @@ class Game:
         self.screen = pygame.display.set_mode( (Config.WINDOW_WIDTH, Config.WINDOW_HEIGHT) ) 
         self.clock = pygame.time.Clock()
         self.bg = pygame.image.load("res/bg-small.png")
+        self.go = pygame.image.load("res/gameoverr")
         self.bg_x = 0
+        self.gameover = False 
+        self.playing = False
+        self.waiting = False
+        self.time = 10
 
     
     def load_map(self, mapfile):
@@ -216,6 +225,8 @@ class Game:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 self.playing = False
+                self.gameover = True
+                self.waiting = False 
 
     def update(self):
         self.all_sprites.update()
