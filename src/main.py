@@ -1,17 +1,15 @@
-<<<<<<< HEAD
-from tracemalloc import start
-=======
-from tkinter import Place
->>>>>>> 3964237ace62c7edddd0615d6ef22ced5a678bcd
-import pygame
 
+from ast import arguments
+from calendar import formatstring
+from distutils import text_file
+from select import select
+from tkinter import Menu, font
+from turtle import Screen, Turtle
+import pygame
+from pygame.locals import *
+import os
 import sys
 
-
-<<<<<<< HEAD
-=======
-
->>>>>>> 3964237ace62c7edddd0615d6ef22ced5a678bcd
 class Spritesheet:
     def __init__(self, file):
         self.sheet = pygame.image.load(file).convert()
@@ -21,8 +19,6 @@ class Spritesheet:
         sprite.blit(self.sheet, (0, 0), (x, y, width, height))
         sprite.set_colorkey(Config.WHITE)
         return sprite
-
-
 
 class Config:
     TILE_SIZE = 32
@@ -245,12 +241,33 @@ class Game:
             self.draw()
             self.clock.tick(Config.FPS)
 
-    
+    def welcome(self):
+        counter = 0
+
+        while True:
+            self.screen.fill(Config.RED)
+            display_text = self.font.render(r'Press Space to Start.. ', False, (0,0, 0))
+            self.screen.blit(display_text, (0, 50))
+            counter_text = self.font.render(f'{counter}', False, (0, 0, 0))
+            self.screen.blit(counter_text, (0, 100))
+            pygame.display.flip()
+            self.clock.tick(Config.FPS)
+            counter += 1
+
+            pygame.event.get()
+            keys = pygame.key.get_pressed()
+            if keys[pygame.K_SPACE]:
+                break
+        
 def main():
     g = Game()
-    g.new()
 
+    g.welcome()
+
+    g.new()
+    
     g.game_loop()
+
 
     pygame.quit()
     sys.exit()
