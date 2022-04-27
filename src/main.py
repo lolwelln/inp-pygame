@@ -1,7 +1,9 @@
-from tracemalloc import start
+from tkinter import Place
 import pygame
 
 import sys
+
+
 
 class Spritesheet:
     def __init__(self, file):
