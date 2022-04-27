@@ -91,7 +91,6 @@ class PlayerSprite(BaseSprite):
             self.current_frame = new_frame
             self.anim_counter = self.anim_counter % (len(self.animation_frames) * self.animation_duration)
 
-    
     def update(self):
         self.handle_movement()
         
@@ -120,7 +119,8 @@ class PlayerSprite(BaseSprite):
             if self.rect.y > self.speed:
                 self.rect.y = self.rect.y - self.speed      
         if keys[pygame.K_DOWN]:
-            self.rect.y = self.rect.y + self.speed
+            if self.rect.bottom < 320:
+                self.rect.y = self.rect.y + self.speed
 
 
     def update_camera(self):
