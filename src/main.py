@@ -10,18 +10,12 @@ import os
 
 import sys
 
-y = input()
-print (y)
-
-c = input()
-print (c)
-
 class Spritesheet:
     def __init__(self, file):
-        self.sheet = pygame.image.load(file).convert()
+        self.sheet = pygame.image.load(file).convert_alpha()
 
     def get_sprite(self, x, y, width, height):
-        sprite = pygame.Surface([width, height])
+        sprite = pygame.Surface([width, height], pygame.SRCALPHA)
         sprite.blit(self.sheet, (0, 0), (x, y, width, height))
         sprite.set_colorkey(Config.WHITE)
         return sprite
@@ -40,9 +34,8 @@ class Config:
     BG_SPEED = 0.3
 
 
-
 class BaseSprite(pygame.sprite.Sprite):
-    def __init__(self, game, x, y, x_pos=0, y_pos=0, width=Config.TILE_SIZE, height=Config.TILE_SIZE, layer=0, groups=None, spritesheet=None):
+    def __init__(self, game, x, y, health=100, x_pos=0, y_pos=0, width=Config.TILE_SIZE, height=Config.TILE_SIZE, layer=0, groups=None, spritesheet=None):
         self._layer = layer
         groups = (game.all_sprites, ) if groups == None else (game.all_sprites, groups)
         super().__init__(groups)
@@ -51,10 +44,11 @@ class BaseSprite(pygame.sprite.Sprite):
         self.y_pos = y_pos
         self.width = width
         self.height = height
+        self.health = health 
+        
 
         if spritesheet == None:
             self.image = pygame.Surface([self.width, self.height])
-            self.image.fill(Config.GREY)
         else:
             self.spritesheet = spritesheet
             self.image = self.spritesheet.get_sprite(
@@ -89,14 +83,6 @@ class PlayerSprite(BaseSprite):
         self.animation_duration = 30
         self.jump_force = 10
         self.movie_counter = 0
-
-#class baum (pygame.sprite.Sprite):
-    #def __init__(self, game, x, y):
-        #img_data = {
-            #'spritesheet': Spritesheet("res/baum.png"),
-        #}
-        #super().__init__(game, x, y, groups=game.ground, layer=1)
-        #self.rect = self.image.get_rect()
 
     def animate(self, x_diff):
         self.anim_counter += abs(x_diff)
@@ -135,8 +121,8 @@ class PlayerSprite(BaseSprite):
             if self.rect.y > self.speed:
                 self.rect.y = self.rect.y - self.speed      
         if keys[pygame.K_DOWN]:
-            if self.rect.y > self.rect.y + self.speed:
-                self.rect.bottom = self.rect.y - self.speed
+            if self.rect.bottom + self.speed < Config.WINDOW_HEIGHT:
+                self.rect.bottom += self.speed
 
 
     def update_camera(self):
@@ -193,7 +179,6 @@ class PlayerSprite(BaseSprite):
         self.standing = True if hits else False
         self.rect.y -= 1
 
-
 class GroundSprite(BaseSprite):
     def __init__(self, game, x, y):
         super().__init__(game, x, y, groups=game.ground, layer=0)
@@ -205,7 +190,7 @@ class Game:
         pygame.init()
         pygame.font.init()
         self.font = pygame.font.Font(None, 30)
-        self.screen = pygame.display.set_mode( (Config.WINDOW_WIDTH, Config.WINDOW_HEIGHT) ) 
+        self.screen = pygame.display.set_mode( (Config.WINDOW_WIDTH, Config.WINDOW_HEIGHT), pygame.SCALED ) 
         self.clock = pygame.time.Clock()
         self.bg = pygame.image.load("res/bg-small.png")
         self.bg_x = 0
@@ -245,7 +230,6 @@ class Game:
             second_x -= 2*Config.WINDOW_WIDTH
         self.screen.blit(tmp_bg, (second_x, 0))
         self.all_sprites.draw(self.screen)
-        pygame.display.update()
 
     def game_loop(self):
         while self.playing:
@@ -258,20 +242,25 @@ class Game:
         counter = 0
 
         while True:
+
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+                    raise SystemExit
+
             self.screen.fill(Config.RED)
-            display_text = self.font.render(' KOKOSHKA start ', False, (0,0, 0))
+            display_text = self.font.render(' Kokoshka START', False, (0,0, 0))
             self.screen.blit(display_text, (0, 50))
             counter_text = self.font.render(f'{counter}', False, (0, 0, 0))
-            self.screen.blit(counter_text, (0, 100))
+            self.screen.blit(counter_text, (80, 160))
             pygame.display.flip()
             self.clock.tick(Config.FPS)
-            counter += 1
 
             pygame.event.get()
             keys = pygame.key.get_pressed()
             if keys[pygame.K_SPACE]:
                 break
-    
+
 def main():
     g = Game()
 
