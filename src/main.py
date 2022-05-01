@@ -248,7 +248,7 @@ class Game:
 
         while True:
             self.screen.fill(Config.RED)
-            display_text = self.font.render(' KOKOSHKA start ', False, (0,0, 0))
+            display_text = self.font.render('KOKOSHKA', False, (0,0, 0))
             self.screen.blit(display_text, (0, 50))
             counter_text = self.font.render(f'{counter}', False, (0, 0, 0))
             self.screen.blit(counter_text, (0, 100))
