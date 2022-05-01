@@ -9,13 +9,21 @@ import pygame
 from pygame.locals import *
 import os
 import sys
+from random import randint, gauss
+from copy import copy
+
+from .bullet import Bullet
+from .log import Log
+
+
+
 
 class Spritesheet:
     def __init__(self, file):
-        self.sheet = pygame.image.load(file).convert()
+        self.sheet = pygame.image.load(file).convert_alpha()
 
     def get_sprite(self, x, y, width, height):
-        sprite = pygame.Surface([width, height])
+        sprite = pygame.Surface([width, height]),pygame.SRCALPHA
         sprite.blit(self.sheet, (0, 0), (x, y, width, height))
         sprite.set_colorkey(Config.WHITE)
         return sprite
@@ -84,6 +92,13 @@ class PlayerSprite(BaseSprite):
         self.jump_force = 10
         self.movie_counter = 0
         
+class baum (pygame.sprite.Sprite):
+    def _init_(self, game, x, y):
+        img_data = {
+        'spritesheet': Spritesheet("res/baum.png"),
+        }
+        super()._init_(game, x, y, groups=game.ground, layer=1)
+        self.rect = self.image.get_rect()
 
     def animate(self, x_diff):
         self.anim_counter += abs(x_diff)
@@ -97,12 +112,11 @@ class PlayerSprite(BaseSprite):
     
     def update(self):
         self.handle_movement()
-        
-        if self.rect.x>160-Config.TILE_SIZE:
+
+        if self.rect.x>160 - Config.TILE_SIZE:
             self.rect.x = 160 - Config.TILE_SIZE
         if self.rect.x<0:
             self.rect.x = 0
-        self.rect.y = self.rect.y - self.y_velocity
         self.check_collision()
         self.y_velocity = max(self.y_velocity - 0.5, Config.MAX_GRAVITY)
 
