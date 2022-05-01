@@ -1,9 +1,20 @@
-from tkinter import Place
+from ast import arguments
+from calendar import formatstring
+from distutils import text_file
+from select import select
+from tkinter import Menu, font
+from turtle import Screen, Turtle
 import pygame
+from pygame.locals import *
+import os
 
 import sys
 
+y = input()
+print (y)
 
+c = input()
+print (c)
 
 class Spritesheet:
     def __init__(self, file):
@@ -79,13 +90,13 @@ class PlayerSprite(BaseSprite):
         self.jump_force = 10
         self.movie_counter = 0
 
-class baum (pygame.sprite.Sprite):
-    def __init__(self, game, x, y):
-        img_data = {
-            'spritesheet': Spritesheet("res/baum.png"),
-        }
-        super().__init__(game, x, y, groups=game.ground, layer=1)
-        self.rect = self.image.get_rect()
+#class baum (pygame.sprite.Sprite):
+    #def __init__(self, game, x, y):
+        #img_data = {
+            #'spritesheet': Spritesheet("res/baum.png"),
+        #}
+        #super().__init__(game, x, y, groups=game.ground, layer=1)
+        #self.rect = self.image.get_rect()
 
     def animate(self, x_diff):
         self.anim_counter += abs(x_diff)
@@ -124,14 +135,14 @@ class baum (pygame.sprite.Sprite):
             if self.rect.y > self.speed:
                 self.rect.y = self.rect.y - self.speed      
         if keys[pygame.K_DOWN]:
-            if self.rect.bottom < 320:
-                self.rect.y = self.rect.y + self.speed
+            if self.rect.y > self.rect.y + self.speed:
+                self.rect.bottom = self.rect.y - self.speed
 
 
     def update_camera(self):
         x_c, y_c = self.game.screen.get_rect().center
         x_diff = x_c - self.rect.centerx
-        y_diff = y_c - self.rect.centery
+        y_diff = y-c - self.rect.centery
         
         self.animate(x_diff)
 
@@ -197,12 +208,7 @@ class Game:
         self.screen = pygame.display.set_mode( (Config.WINDOW_WIDTH, Config.WINDOW_HEIGHT) ) 
         self.clock = pygame.time.Clock()
         self.bg = pygame.image.load("res/bg-small.png")
-        self.go = pygame.image.load("res/gameoverr.png")
         self.bg_x = 0
-        self.gameover = False 
-        self.playing = False
-        self.waiting = False
-        self.time = 10
 
     
     def load_map(self, mapfile):
@@ -227,8 +233,6 @@ class Game:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 self.playing = False
-                self.gameover = True
-                self.waiting = False 
 
     def update(self):
         self.all_sprites.update()
@@ -250,9 +254,29 @@ class Game:
             self.draw()
             self.clock.tick(Config.FPS)
 
+    def welcome(self):
+        counter = 0
+
+        while True:
+            self.screen.fill(Config.RED)
+            display_text = self.font.render(' KOKOSHKA start ', False, (0,0, 0))
+            self.screen.blit(display_text, (0, 50))
+            counter_text = self.font.render(f'{counter}', False, (0, 0, 0))
+            self.screen.blit(counter_text, (0, 100))
+            pygame.display.flip()
+            self.clock.tick(Config.FPS)
+            counter += 1
+
+            pygame.event.get()
+            keys = pygame.key.get_pressed()
+            if keys[pygame.K_SPACE]:
+                break
     
 def main():
     g = Game()
+
+    g.welcome()
+
     g.new()
 
     g.game_loop()
