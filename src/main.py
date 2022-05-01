@@ -25,7 +25,7 @@ class Config:
     WINDOW_WIDTH = 160
     WINDOW_HEIGHT = 320
     BLACK = (0, 0, 0)
-    RED = (255, 0, 0)
+    RED = (255,62,150)
     GREEN = (0, 255, 0)
     GREY = (128, 128, 128)
     WHITE = (255, 255, 255)
@@ -123,7 +123,9 @@ class PlayerSprite(BaseSprite):
             if self.rect.y > self.speed:
                 self.rect.y = self.rect.y - self.speed      
         if keys[pygame.K_DOWN]:
-            self.rect.y = self.rect.y + self.speed
+            if self.rect.y > self.rect.y + self.speed:
+                self.rect.bottom = self.rect.y - self.speed
+
 
 
     def update_camera(self):
@@ -246,7 +248,7 @@ class Game:
 
         while True:
             self.screen.fill(Config.RED)
-            display_text = self.font.render(r'Press Space to Start.. ', False, (0,0, 0))
+            display_text = self.font.render(' KOKOSHKA start ', False, (0,0, 0))
             self.screen.blit(display_text, (0, 50))
             counter_text = self.font.render(f'{counter}', False, (0, 0, 0))
             self.screen.blit(counter_text, (0, 100))
