@@ -76,6 +76,8 @@ class BaseSprite(pygame.sprite.Sprite):
 
 
 class PlayerSprite(BaseSprite):
+    MAX_HP = 5
+
     def __init__(self, game, x, y, **kwargs):
         img_data = {
             'spritesheet': Spritesheet("res/player.png"),
@@ -91,6 +93,14 @@ class PlayerSprite(BaseSprite):
         self.animation_duration = 30
         self.jump_force = 10
         self.movie_counter = 0
+
+        self.rect.bottom = Config.WINDOW_HEIGHT * 4/5
+        self.bullets: list[Bullet] = []
+        self.logs: list[Log] = []
+
+        self.hp = copy(self.MAX_HP)
+        self.score = 0
+        self.stage = 1
         
 class baum (pygame.sprite.Sprite):
     def _init_(self, game, x, y):
@@ -117,8 +127,29 @@ class baum (pygame.sprite.Sprite):
             self.rect.x = 160 - Config.TILE_SIZE
         if self.rect.x<0:
             self.rect.x = 0
+
+        self.rect.y = self.rect.y - self.y_velocity
         self.check_collision()
         self.y_velocity = max(self.y_velocity - 0.5, Config.MAX_GRAVITY)
+    
+    bullet_to_remove = []
+    for bullet in self.bullets:
+            bullet.update()
+            if bullet.rect.bottom < 0:
+                bullet_to_remove.append(bullet)
+        # we remove the bullet that went out of the screen
+    _ = [self.bullets.remove(bullet) for bullet in bullet_to_remove]
+
+        # same for logs
+    logs_to_remove = []
+    for log in self.logs:
+        result = log.update()
+        if result == "kill":
+            logs_to_remove.append(log)
+    _ = [self.logs.remove(log) for log in logs_to_remove]
+
+    def shoot(self):
+        self.bullets.append(Bullet(self.rect.centerx, self.rect.centery, pygame.Vector2(0, -5), (255, 0, 0)))
 
     def jump(self):
         if self.standing:
@@ -208,11 +239,18 @@ class Game:
         pygame.init()
         pygame.font.init()
         self.font = pygame.font.Font(None, 30)
+        self.font2 = pygame.font.Font(None,20)
+        self.ui_font = pygame.font.Font(None, 20)
         self.screen = pygame.display.set_mode( (Config.WINDOW_WIDTH, Config.WINDOW_HEIGHT) ) 
         self.clock = pygame.time.Clock()
-        self.bg = pygame.image.load("res/bg-small.png")
+        self.bg = pygame.image.load("res/bg-small.png").convert()
+        self.bg_ground = pygame.image.load("res/Ground.png").convert()
         self.bg_x = 0
 
+        self.delay_between_logs = 1000
+        self.last_log_time = 0
+        self.started = 0
+        self.stage = 1
     
     def load_map(self, mapfile):
         with open(mapfile, "r") as f:
@@ -223,6 +261,46 @@ class Game:
                     if c == "p":
                         self.player = PlayerSprite(self, x, y)
 
+    def spawn_logs(self):
+        if pygame.time.get_ticks() - self.last_log_time > self.delay_between_logs:
+            for _ in range(1+self.stage // 2):
+                self.player.logs.append(Log(randint(0, Config.WINDOW_WIDTH), randint(-40, 0), pygame.Vector2(0, abs(gauss(4, 2+self.stage/10))+1), self.player, Config))
+            self.last_log_time = pygame.time.get_ticks()
+
+    def game_over(self):
+        bg = self.screen.copy()
+        layer = pygame.Surface((Config.WINDOW_WIDTH, Config.WINDOW_HEIGHT))
+        layer.fill((0, 0, 0))
+        layer.set_alpha(128)
+
+        game_over_text = self.font.render("Game Over !", True, (255, 255, 255))
+        press_text = self.font2.render("Press any key to restart!", True, (255, 255, 255))
+        score_text = self.font.render(f"Your score: {self.player.score}", True, (255, 255, 255))
+
+        while True:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+                    raise SystemExit
+                if event.type == pygame.KEYDOWN:
+                    self.new()
+                    return
+
+            self.screen.blit(bg, (0, 0))
+            self.screen.blit(layer, (0, 0))
+
+            self.screen.blit(game_over_text, game_over_text.get_rect(center=(Config.WINDOW_WIDTH//2,
+                                                                             Config.WINDOW_HEIGHT/3)))
+            self.screen.blit(score_text, game_over_text.get_rect(center=(Config.WINDOW_WIDTH//2,
+                                                                         Config.WINDOW_HEIGHT//2)))
+
+            if (pygame.time.get_ticks() // 500) % 2 == 1:
+                self.screen.blit(press_text, press_text.get_rect(center=(Config.WINDOW_WIDTH//2,
+                                                                         Config.WINDOW_HEIGHT*2/3)))
+
+            self.clock.tick(Config.FPS)
+            pygame.display.flip()
+
     def new(self):
         self.playing = True
 
@@ -231,14 +309,29 @@ class Game:
         self.players = pygame.sprite.LayeredUpdates()
 
         self.load_map("maps/level-01.txt")
+        self.started = pygame.time.get_ticks()
+
+        self.player.hp = copy(self.player.MAX_HP)
+        self.player.logs = []
+        self.player.bullet = []
 
     def handle_events(self):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 self.playing = False
 
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_UP:
+                    self.player.shoot()
+
     def update(self):
+        # each stage increase the number of logs spawned, and their velocity (each stage
+        self.stage = (pygame.time.get_ticks() - self.started) // 4000 + 1
+        if self.stage > 10:
+            self.stage = 10
+        self.player.stage = self.stage
         self.all_sprites.update()
+        self.spawn_logs()
 
     def draw(self):
         self.screen.blit(self.bg, (self.bg_x, 0))
@@ -248,6 +341,29 @@ class Game:
             second_x -= 2*Config.WINDOW_WIDTH
         self.screen.blit(tmp_bg, (second_x, 0))
         self.all_sprites.draw(self.screen)
+        for bullet in self.player.bullets:
+            bullet.draw(self.screen)
+        for log in self.player.logs:
+            log.draw(self.screen)
+        self.screen.blit(self.bg_ground, (0, Config.WINDOW_HEIGHT*4/5))
+
+        render_hp = self.ui_font.render("HP: "+str(self.player.hp)+" / "+str(self.player.MAX_HP), True, (255, 255, 255))
+        render_stage = self.ui_font.render("Stage: "+str(self.stage), True, (255, 255, 255))
+        render_score = self.ui_font.render("Score: "+str(self.player.score), True, (255, 255, 255))
+        dy = Config.WINDOW_HEIGHT * 4 / 5 + 15
+        pygame.draw.rect(self.screen, (255, 0, 0), [10, dy-2, Config.WINDOW_WIDTH-20, render_hp.get_height()+4],
+                         width=2, border_radius=10)
+        pygame.draw.rect(self.screen, (255, 0, 0), [10, dy - 2, self.player.hp*(Config.WINDOW_WIDTH - 20)/5,
+                                                    render_hp.get_height() + 4], border_radius=10)
+        self.screen.blit(render_hp, render_hp.get_rect(centerx=(Config.WINDOW_WIDTH//2), y=dy))
+        dy += render_hp.get_height() + 4
+        self.screen.blit(render_stage, render_stage.get_rect(centerx=Config.WINDOW_WIDTH//2, y=dy))
+        dy += render_stage.get_height() + 4
+        self.screen.blit(render_score, render_score.get_rect(centerx=Config.WINDOW_WIDTH//2, y=dy))
+        
+        if self.player.hp == 0:
+            self.game_over()
+
         pygame.display.update()
 
     def game_loop(self):
@@ -258,22 +374,30 @@ class Game:
             self.clock.tick(Config.FPS)
 
     def welcome(self):
-        counter = 0
+        
+        display_text = self.font.render('KOKOSHKA', False, (255, 255, 255))
+        press_text = self.font2.render('Press any key to start', False, (255, 255, 255))
 
         while True:
-            self.screen.fill(Config.RED)
-            display_text = self.font.render('KOKOSHKA', False, (0,0, 0))
-            self.screen.blit(display_text, (0, 50))
-            counter_text = self.font.render(f'{counter}', False, (0, 0, 0))
-            self.screen.blit(counter_text, (0, 100))
+            for event in pygame.event.get():
+                print(event)
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+                    raise SystemExit
+
+                if event.type == pygame.KEYDOWN:
+                    return
+
+            self.screen.blit(self.bg, (0, 0))
+
+            self.screen.blit(display_text, display_text.get_rect(center=(Config.WINDOW_WIDTH//2,
+                                                                         Config.WINDOW_HEIGHT//2 - 50)))
+            if (pygame.time.get_ticks() // 500) % 2 == 1:
+                self.screen.blit(press_text, press_text.get_rect(center=(Config.WINDOW_WIDTH//2,
+                                                                         Config.WINDOW_HEIGHT//2 + 50)))
+
             pygame.display.flip()
             self.clock.tick(Config.FPS)
-            counter += 1
-
-            pygame.event.get()
-            keys = pygame.key.get_pressed()
-            if keys[pygame.K_SPACE]:
-                break
         
 def main():
     g = Game()
