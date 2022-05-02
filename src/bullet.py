@@ -15,7 +15,6 @@ class Bullet:
         self.velocity = vel
 
     def update(self):
-        # rect.update changes the position of the rect, and rect.move(x, y) returns a moved rect
         self.rect.update(self.rect.move(self.velocity))
 
     def draw(self, screen: pg.Surface):
