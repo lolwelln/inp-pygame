@@ -1,6 +1,6 @@
 import pygame as pg
 
-
+#pg.math berechnet irgendwas im code
 vec = pg.math.Vector2
 
 
